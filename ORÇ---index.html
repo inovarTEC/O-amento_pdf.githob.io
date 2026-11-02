@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>OrçaElétrica</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;600;800&display=swap">
+<style>
+:root{--bg:#f6f7f9;--ink:#14213d;--mut:#5b6478;--line:#d5d9e2;--card:#fff;--pri:#1f4fb4;--on:#fff;--ye:#f2b705;--ok:#2e7d4f;--warn:#a85d00;--err:#b3261e;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1626;--ink:#eef1f7;--mut:#a3acc0;--line:#2b3550;--card:#18213a;--pri:#7aa2ff;--on:#0f1626;--warn:#f0b35a;--ok:#6fcf97;--err:#ff8a80}}
+:root[data-theme="dark"]{--bg:#0f1626;--ink:#eef1f7;--mut:#a3acc0;--line:#2b3550;--card:#18213a;--pri:#7aa2ff;--on:#0f1626;--warn:#f0b35a;--ok:#6fcf97;--err:#ff8a80}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.5 "Schibsted Grotesk",system-ui,sans-serif}
+header,main{max-width:980px;margin:0 auto;padding:16px}
+h1{font-size:1.8rem;font-weight:800;margin:8px 0 12px}
+h2{font-size:1.3rem;margin:8px 0 12px}
+h3{font-size:1.05rem;margin:14px 0 4px}
+button,input,select,textarea{font-family:inherit;font-size:1rem;color:var(--ink)}
+:focus-visible{outline:3px solid var(--ye);outline-offset:2px}
+.pri,.sec,.chip,.del{border-radius:8px;padding:10px 16px;cursor:pointer;font-weight:600}
+.pri{background:var(--pri);color:var(--on);border:2px solid var(--pri)}
+.pri:disabled{opacity:.4;cursor:not-allowed}
+.sec,.chip{background:var(--card);border:2px solid var(--line)}
+.del{background:none;border:2px solid var(--line);color:var(--warn);padding:6px 12px}
+.steps{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:0 0 16px;padding:0;list-style:none}
+.steps li{padding:8px 0;border-bottom:4px solid var(--line);color:var(--mut);font-size:.9rem;font-weight:600}
+.steps li[aria-current="step"]{border-color:var(--ye);color:var(--ink)}
+.steps li.done{border-color:var(--pri)}
+.chips,.row{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+label{display:block;font-weight:600;font-size:.92rem}
+label input,label select,label textarea{display:block;width:100%;margin-top:4px;padding:9px 10px;border:2px solid var(--line);border-radius:8px;background:var(--card);font-weight:400}
+label.ck{display:flex;gap:8px;align-items:center;font-weight:400}
+label.ck input{width:auto;margin:0}
+fieldset{border:1px solid var(--line);border-radius:8px;margin:8px 0;display:flex;flex-wrap:wrap;gap:6px 16px}
+legend{font-weight:600;font-size:.92rem;padding:0 6px}
+.f{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:12px 0;align-items:end}
+.box{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:12px}
+.g3{display:grid;grid-template-columns:1fr 290px;gap:16px;align-items:start}
+@media (max-width:720px){.g3{grid-template-columns:1fr}.steps li{font-size:.7rem}}
+details.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 16px;margin-bottom:10px}
+details.card>summary{font-weight:700;cursor:pointer}
+details.card .box{background:var(--bg)}
+details.tec{margin-top:8px;border-top:1px dashed var(--line);padding-top:8px}
+details.tec>summary{color:var(--pri);font-weight:600;cursor:pointer}
+dl{display:flex;gap:24px;margin:0 0 8px}dt{color:var(--mut);font-size:.85rem}dd{margin:0;font-size:1.5rem;font-weight:800}
+ul.p{margin:6px 0;padding-left:20px;color:var(--warn)}
+.ok{color:var(--ok);font-weight:600}
+.note{color:var(--mut);font-size:.88rem;margin:8px 0}
+.err{color:var(--err);font-weight:600;margin:8px 0}
+.empty{padding:20px;border:2px dashed var(--line);border-radius:10px;color:var(--mut)}
+table{width:100%;border-collapse:collapse;font-size:.92rem}th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}
+.wrap{overflow-x:auto}
+.qr{width:160px;height:160px;border:2px dashed var(--line);display:grid;place-items:center;text-align:center;color:var(--mut);font-size:.85rem;padding:8px}
+#toast{position:fixed;left:16px;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));max-width:560px;margin:auto;background:var(--ink);color:var(--bg);padding:14px 16px;border-radius:10px;display:none}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+#nav{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+#nav .note{margin:0}
+.chip[aria-pressed="true"]{border-color:var(--pri);color:var(--pri)}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+</head>
+<body>
+<header><h1>OrçaElétrica</h1><nav id="nav" aria-label="Conta"></nav></header>
+<main id="app"></main>
+<div id="toast" role="status" aria-live="polite"></div>
+<script>
+const KEY='orca_draft';
+const SB_URL='COLE_AQUI_A_URL_DO_PROJETO_SUPABASE';
+const SB_KEY='COLE_AQUI_A_CHAVE_ANON_PUBLICA';
+const sb=(window.supabase&&/^https:\/\//.test(SB_URL))?window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}):null;
+const TMP='orca_pending';
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const nid=p=>p+Math.random().toString(36).slice(2,8);
+const DEF={'Sala':3,'Sala de estar':3,'Quarto':3,'Garagem':3,'Terraço':3,'Varanda':3,'Corredor':3,'Escritório':3,'Outro':3,'Cozinha':2,'Banheiro':2,'Área de serviço':2};
+const PRE=Object.keys(DEF);
+const IMV=['Casa','Apartamento','Comércio pequeno'],OBR=['Construção nova','Reforma','Ampliação'],COB=['Laje','Forro de gesso','Telhado aparente','Não sei'],INS=['Embutida na parede','Aparente','Pela laje'],EQT=['Chuveiro elétrico','Torneira elétrica','Ar-condicionado','Forno elétrico','Cooktop elétrico','Máquina de lavar','Secadora','Aquecedor','Bomba','Carregador de veículo elétrico','Outro'];
+const REDE=['Monofásico','Bifásico','Trifásico','Não sei'];
+const BANDS=[['Até 5 m',2.5],['5 a 10 m',7.5],['10 a 20 m',15],['Mais de 20 m',25]];
+const HS=[['baixa','Baixa (30 cm)'],['media','Média (110 cm)'],['alta','Alta (210 cm)']];
+const MOD={T10:'Tomada 10 A simples',T10D:'Tomada 10 A dupla',T20:'Tomada 20 A simples',T20D:'Tomada 20 A dupla',USB:'Módulo USB'};
+const TOM=['T10','T10D','T20','T20D'];
+const CMD={IS:'Simples',IP:'Paralelo',II:'Intermediário'};
+const CX=['Redonda','4x4','4x2'];
+const isT=m=>m.t[0]==='T';
+const STEPN=['Imóvel','Cômodos','Pontos','Equipamentos','Prévia'],LAST=STEPN.length-1;
+const fresh=()=>({id:nid('o'),imovel:'',obra:'',cobertura:'',rede:'',rooms:[],equips:[],save:false,step:0,view:'form',user:null,order:null,err:'',conf:null});
+const mkCx=()=>({id:nid('x'),tipo:'4x4',inst:'',s:true});
+const mkMod=t=>({id:nid('m'),t});
+const mkSw=()=>({id:nid('w'),h:'media',d:'',tom:'',cx:'4x2'});
+const mkPonto=()=>({id:nid('p'),h:'baixa',d:'',cx:'4x2',mods:[mkMod('T10')]});
+const mkLuz=()=>({id:nid('z'),d:'',cx:'Redonda'});
+const luzCount=r=>{const a=(+r.c||0)*(+r.l||0);return a<=6?1:a<=20?2:3};
+function suggestLuz(r){if(!r.luzAuto)return false;const n=luzCount(r),k=r.luzes.length;while(r.luzes.length<n)r.luzes.push(mkLuz());while(r.luzes.length>n){const z=r.luzes.pop();r.comandos.forEach(c=>c.luzes=c.luzes.filter(i=>i!==z.id))}return r.luzes.length!==k}
+const mkCmd=()=>({id:nid('k'),t:'IS',luzes:[],sws:[mkSw()]});
+const mk=(base,nome)=>{const r={id:nid('c'),base,nome,c:3,l:3,medE:true,via:'',dq:'',dd:'',dr:'',dqE:false,ddE:false,drE:false,dpad:DEF[base]??3,dpadE:true,pontos:[],luzes:[],luzAuto:true,comandos:[],caixas:[mkCx()],pe:'',inst:'',obs:''};suggestLuz(r);return r};
+function readTmp(){try{const j=JSON.parse(localStorage.getItem(TMP)||'null');if(j&&Date.now()-j.ts<864e5)return j}catch(e){}return null}
+function saveTmp(){try{localStorage.setItem(TMP,JSON.stringify({ts:Date.now(),want:true,s:{...S,user:null,order:null}}))}catch(e){}}
+function clearTmp(){try{localStorage.removeItem(TMP)}catch(e){}}
+function load(){try{let j=readTmp();if(!j){j=JSON.parse(localStorage.getItem(KEY)||'null');if(!(j&&Date.now()-j.ts<6048e5))j=null}if(j){const s=Object.assign(fresh(),j.s,{view:'form',err:'',user:null,order:null,conf:null});
+  s.rooms=s.rooms.map(r=>{const b=mk(r.base,r.nome);Object.keys(b).forEach(k=>{if(k in r)b[k]=r[k]});
+    b.pontos=b.pontos.map(p=>({id:p.id,h:p.h,d:p.d,cx:p.cx||'4x2',mods:(p.mods||[]).filter(m=>m.t&&(m.t[0]==='T'||m.t==='USB')).map(m=>({id:m.id,t:m.t}))})).filter(p=>p.mods.length);
+    if(!('medE' in r)){b.medE=false;b.luzAuto=false}
+    b.luzes=b.luzes.map(z=>({...z,cx:CX.includes(z.cx)?z.cx:'Redonda'}));
+    b.comandos=b.comandos.map(k=>({...k,sws:k.sws.map(w=>({...w,cx:w.cx||'4x2'}))}));
+    b.caixas=b.caixas.map(x=>({...x,tipo:CX.includes(x.tipo)?x.tipo:'4x4'}));return b});s.equips=s.equips.map(q=>('dint' in q)?q:{...q,dint:q.dist??'',dist:'',alim:''});s.step=Math.min(s.step,LAST);return s}}catch(e){}return null}
+let S=load()||fresh(),lock=0;
+const AUTH={tab:'in',busy:false,err:'',msg:'',email:'',nome:'',whats:'',rec:/type=recovery/.test(location.hash)};
+let NEXT=!!(readTmp()&&readTmp().want&&/access_token|type=/.test(location.hash));
+{const hp=new URLSearchParams(location.hash.slice(1));if(hp.get('error_description')){AUTH.err='O link expirou ou já foi usado. Peça um novo na aba “Esqueci minha senha”.';AUTH.tab='rec';S.view='cad'}}
+function persist(){if(!S.save)return;try{localStorage.setItem(KEY,JSON.stringify({ts:Date.now(),s:{...S,user:null,order:null}}))}catch(e){}}
+const room=id=>S.rooms.find(r=>r.id===id);
+function addRoom(b){const n=S.rooms.filter(r=>r.base===b).length;S.rooms.push(mk(b,n?b+' '+(n+1):b))}
+const fixSw=c=>{const n={IS:1,IP:2,II:3}[c.t];while(c.sws.length<n)c.sws.push(mkSw());if(c.t==='IS')c.sws.length=1;else if(c.t==='IP')c.sws.length=2};
+const pts=r=>r.pontos.length+r.luzes.length;
+const eff=(r,o)=>o.d!==''?(+o.d||0):(+r.dpad||0);
+const swSum=r=>r.comandos.reduce((s,c)=>s+c.sws.reduce((a,w,i)=>a+(i?+w.d||0:0),0),0);
+const entre=r=>r.pontos.reduce((s,p)=>s+eff(r,p),0)+r.luzes.reduce((s,z)=>s+eff(r,z),0)+swSum(r);
+const mods=r=>r.pontos.flatMap(p=>p.mods);
+const nInt=r=>r.comandos.reduce((s,c)=>s+c.sws.length,0);
+const nTom=r=>mods(r).filter(isT).length+r.comandos.reduce((s,c)=>s+c.sws.filter(w=>w.tom).length,0);
+const nUsb=r=>mods(r).filter(m=>m.t==='USB').length;
+const nCx=r=>r.pontos.length+nInt(r)+r.luzes.length+r.caixas.length;
+const defInst=r=>r.inst==='Aparente'?'Sobreposta':'Embutida';
+const routeLen=r=>r.via?(+r.dd||0)+(+r.dr||0):(+r.dq||0);
+const routeOk=r=>r.via?(r.dd!==''&&r.dr!==''):r.dq!=='';
+const trunk=()=>S.rooms.reduce((s,r)=>s+(r.via?+r.dr||0:+r.dq||0),0);
+function pend(){
+  const p=[];
+  if(!S.imovel)p.push('Tipo de imóvel não informado');
+  if(!S.obra)p.push('Tipo de obra não informado');
+  if(!S.cobertura)p.push('Cobertura ou teto não informado');else if(S.cobertura==='Não sei')p.push('Cobertura ou teto a confirmar');
+  if(!S.rede)p.push('Ligação da rede elétrica não informada');else if(S.rede==='Não sei')p.push('Ligação da rede elétrica a confirmar');
+  if(!S.rooms.length)p.push('Nenhum cômodo cadastrado');
+  let est=false,pad=false,med=false;
+  S.rooms.forEach(r=>{const n=r.nome||'Cômodo',par=r.via?room(r.via):null;
+    if(!(r.c>0&&r.l>0))p.push(n+': faltam as medidas');
+    if(!routeOk(r))p.push(n+': faltam as distâncias até o quadro');
+    else if(par&&+r.dd>routeLen(par))p.push(n+': o ponto onde os caminhos se separam passa do caminho de '+par.nome);
+    if(r.dqE||r.ddE||r.drE)est=true;
+    if(r.medE)med=true;
+    if(pts(r)===0)p.push(n+': nenhum ponto informado');
+    else if(!r.inst)p.push(n+': tipo de instalação não informado');
+    if(r.dpadE&&[...r.pontos,...r.luzes].some(o=>o.d===''))pad=true;
+    r.luzes.forEach((z,j)=>{if(!r.comandos.some(c=>c.luzes.includes(z.id)))p.push(n+': Luz '+(j+1)+' sem interruptor')});
+    r.comandos.forEach((c,i)=>{
+      if(!c.luzes.length)p.push(n+': comando '+(i+1)+' não aciona nenhuma luz');
+      if(c.sws.some((w,k)=>k&&w.d===''))p.push(n+': faltam distâncias entre os interruptores do comando '+(i+1))})});
+  if(est)p.push('Há distâncias estimadas: confirme as medidas quando puder');
+  if(pad)p.push('Há distâncias padrão entre pontos: confirme se puder');
+  if(med)p.push('Há cômodos com medidas padrão: confirme se puder');
+  let eqEst=false;
+  S.equips.forEach(q=>{const r=room(q.room),nm=q.tipo||'Equipamento';
+    if(!q.tipo||!r||!(q.pot>0)||!q.tens)p.push(nm+': faltam tipo, cômodo, potência ou tensão');
+    if(q.tipo==='Ar-condicionado'&&!q.alim)p.push(nm+': falta informar onde chega a alimentação');
+    if(q.dist===''){if(!r||!routeOk(r)||q.dint==='')p.push(nm+': falta a distância até o quadro');else eqEst=true}});
+  if(eqEst)p.push('Há equipamentos com distância estimada pela rota do cômodo: confirme se puder');
+  return [...new Set(p)];
+}
+function summary(){
+  const p=pend();
+  return `<dl><div><dt>Cômodos</dt><dd>${S.rooms.length}</dd></div><div><dt>Pontos</dt><dd>${S.rooms.reduce((a,r)=>a+pts(r),0)}</dd></div><div><dt>Equip.</dt><dd>${S.equips.length}</dd></div></dl>`+
+  (p.length?`<strong>Pendências</strong><ul class="p">${p.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:'<p class="ok">Sem pendências.</p>')+
+  '<p class="note">A prévia não mostra preço, bitola nem metragem de material. Diâmetro do eletroduto, número de vias e cabos saem do cálculo, no PDF completo.</p>';
+}
+const eqDist=q=>{const r=room(q.room);return q.dist!==''?(+q.dist||0):(r&&routeOk(r)?routeLen(r)+(+q.dint||0):0)};
+const eqSug=q=>{const r=room(q.room);if(q.dist!=='')return 'Distância informada por você.';if(!r||!routeOk(r)||q.dint==='')return 'Informe o cômodo e a distância dentro dele para ver uma estimativa.';const a=routeLen(r),b=+q.dint||0;return `Estimativa pela rota do cômodo: ${a+b} m (${a} m até o cômodo + ${b} m dentro dele). Digite a medida real se souber.`};
+const ligacao=q=>{if(!q.tens)return '';const f=q.tens==='127 V'?'fase, neutro e terra':(S.rede==='Bifásico'||S.rede==='Trifásico')?'duas fases e terra':S.rede==='Monofásico'?'fase, neutro e terra':'';return f?`Ligação prevista: ${f}. É só uma informação: o cálculo confirma.`:'A ligação em 220 V depende do tipo de rede: informe no passo do imóvel.'};
+const live=()=>`<div class="live">${summary()}</div>`;
+const fld=(o,k,l,t='number',a='min="0" max="999" step="any"',x='')=>`<label>${l}<input type="${t}" ${t==='number'?a+' inputmode="decimal"':''} value="${esc(o[k])}" ${x||`data-id="${o.id}" data-k="${k}"`}></label>`;
+const opt=(v,list)=>`<option value="">Selecione</option>`+list.map(o=>`<option ${o===v?'selected':''}>${o}</option>`).join('');
+const sel=(v,pairs,first='')=>(first?`<option value="">${first}</option>`:'')+pairs.map(([k,t])=>`<option value="${k}" ${k===v?'selected':''}>${t}</option>`).join('');
+const rmb=(act,key,rid)=>`<button class="del" data-act="${act}" data-id="${rid||key}" data-key="${key}">${S.conf===key?'Confirmar remoção':'Remover'}</button>`;
+const num=a=>`type="number" min="0" max="999" step="any" inputmode="decimal" ${a}`;
+const dst=(o,k,l)=>`<div><label>${l}<span data-est="${o.id}${k}">${o[k+'E']?' (estimativa)':''}</span><input type="number" min="0" max="999" step="any" inputmode="decimal" value="${esc(o[k])}" data-id="${o.id}" data-k="${k}" data-d></label>
+ <label>Não sei a medida<select data-id="${o.id}" data-band="${k}"><option value="">Escolher uma faixa</option>${BANDS.map(b=>`<option value="${b[1]}">${b[0]}</option>`).join('')}</select></label></div>`;
+const modHtml=(r,p,m)=>{const at=`data-id="${r.id}" data-p="${p.id}" data-m="${m.id}"`;
+  return `<div class="f"><label>Módulo<select ${at} data-k="t">${sel(m.t,Object.entries(MOD))}</select></label>${p.mods.length>1?`<div><button class="del" data-act="rmm" ${at}>Remover módulo</button></div>`:''}</div>`};
+const pontoHtml=(r,p,i)=>`<div class="box"><div class="f"><strong>Ponto ${i+1}</strong>
+  <label>Altura<select data-id="${r.id}" data-p="${p.id}" data-k="h">${sel(p.h,HS)}</select></label>
+  <label>${i?`Distância do ponto ${i} (m)`:'Distância da entrada (m)'}<input ${num(`placeholder="${r.dpad} (padrão)" value="${esc(p.d)}" data-id="${r.id}" data-p="${p.id}" data-k="d"`)}></label>
+  <label>Caixa<select data-id="${r.id}" data-p="${p.id}" data-k="cx">${sel(p.cx,[['4x2','4x2'],['4x4','4x4']])}</select></label></div>
+  ${p.mods.map(m=>modHtml(r,p,m)).join('')}
+  <div class="row"><button class="chip" data-act="addm" data-id="${r.id}" data-p="${p.id}">Adicionar módulo</button><button class="chip" data-act="dupp" data-id="${r.id}" data-p="${p.id}">Copiar este ponto</button>${rmb('rmp',p.id,r.id)}</div></div>`;
+const luzHtml=(r,z,i)=>`<div class="box"><div class="f"><label>${i?`Luz ${i+1}, da luz ${i} (m)`:'Luz 1, da entrada (m)'}<input ${num(`placeholder="${r.dpad} (padrão)" value="${esc(z.d)}" data-id="${r.id}" data-lz="${z.id}" data-k="d"`)}></label>
+  <label>Caixa do ponto de luz<select data-id="${r.id}" data-lz="${z.id}" data-k="cx">${sel(z.cx,CX.map(x=>[x,x]))}</select></label>
+  <div><button class="del" data-act="rml" data-id="${r.id}" data-lz="${z.id}">Remover luz</button></div></div></div>`;
+const cmdHtml=(r,c,ci)=>{const n=c.sws.length,at=`data-id="${r.id}" data-c="${c.id}"`;
+  return `<div class="box"><div class="f"><strong>Comando ${ci+1}</strong><label>Tipo de interruptor<select ${at} data-k="t" data-rr>${sel(c.t,Object.entries(CMD))}</select></label></div>
+  <fieldset><legend>Aciona</legend>${r.luzes.length?r.luzes.map((z,j)=>`<label class="ck"><input type="checkbox" data-id="${r.id}" data-cz="${c.id}" data-lz="${z.id}" ${c.luzes.includes(z.id)?'checked':''}> Luz ${j+1}</label>`).join(''):'<span class="note">Adicione os pontos de luz primeiro.</span>'}</fieldset>
+  ${c.sws.map((w,i)=>{const a=`${at} data-s="${w.id}"`,nm=c.t==='IS'?'simples':(i===0||i===n-1)?'paralelo':'intermediário';
+   return `<div class="f"><strong>Interruptor ${i+1} (${nm})</strong>
+    <label>Altura<select ${a} data-k="h">${sel(w.h,HS)}</select></label>
+    ${i?`<label>Distância do interruptor ${i} (m)<input ${num(`value="${esc(w.d)}" ${a} data-k="d"`)}></label>`:''}
+    <label>Caixa<select ${a} data-k="cx">${sel(w.cx,[['4x2','4x2'],['4x4','4x4']])}</select></label>
+    <label>Tomada na mesma caixa<select ${a} data-k="tom">${sel(w.tom,TOM.map(k=>[k,MOD[k]]),'Nenhuma')}</select></label>
+    ${c.t==='II'&&n>3&&i>0&&i<n-1?`<div><button class="del" data-act="rms" ${a}>Remover</button></div>`:''}</div>`}).join('')}
+  <div class="row">${c.t==='II'?`<button class="chip" data-act="adds" ${at}>Adicionar intermediário</button>`:''}<button class="del" data-act="rmc" ${at}>Remover comando</button></div></div>`};
+const cxHtml=(r,x,i)=>`<div class="f"><strong>Caixa de passagem ${i+1}${x.s?' (sugerida)':''}</strong>
+  <label>Tipo<select data-id="${r.id}" data-bx="${x.id}" data-k="tipo">${sel(x.tipo,CX.map(k=>[k,k]))}</select></label>
+  <label>Instalação<select data-id="${r.id}" data-bx="${x.id}" data-k="inst">${sel(x.inst,[['Embutida','Embutida'],['Sobreposta','Sobreposta']],'Padrão ('+defInst(r)+')')}</select></label>
+  <div><button class="del" data-act="rmx" data-id="${r.id}" data-bx="${x.id}">Remover</button></div></div>`;
+
+function stepForm(){
+  if(S.step===0)return `<h2>Sobre o imóvel</h2><div class="box"><div class="f">
+   <label>Tipo de imóvel<select data-g="imovel">${opt(S.imovel,IMV)}</select></label>
+   <label>Tipo de obra<select data-g="obra">${opt(S.obra,OBR)}</select></label>
+   <label>Teto ou cobertura<select data-g="cobertura">${opt(S.cobertura,COB)}</select></label>
+   <label>Ligação da rede elétrica<select data-g="rede">${opt(S.rede,REDE)}</select></label></div>
+   <p class="note">Se não souber o teto ou a ligação da rede, escolha “Não sei”: vira pendência. A ligação (monofásico, bifásico ou trifásico) costuma aparecer na conta de luz.</p>
+   <label class="ck"><input type="checkbox" data-sv ${S.save?'checked':''}> Salvar meu rascunho neste navegador por 7 dias</label></div>`;
+  if(S.step===1)return `<h2>Cômodos e caminho até o quadro</h2><div class="chips" role="group" aria-label="Adicionar cômodo">${PRE.map(b=>`<button class="chip" data-act="add" data-b="${b}">Adicionar ${b.toLowerCase()}</button>`).join('')}</div>`+
+   (S.rooms.length?S.rooms.map((r,i)=>`<details class="card" open><summary data-nm="${r.id}">${esc(r.nome||'Sem nome')}</summary>
+    <div class="f">${fld(r,'nome','Nome','text')}<label>Comprimento (m)<span data-est="${r.id}med">${r.medE?' (padrão)':''}</span><input ${num(`value="${esc(r.c)}" data-id="${r.id}" data-k="c"`)}></label><label>Largura (m)<span data-est="${r.id}med">${r.medE?' (padrão)':''}</span><input ${num(`value="${esc(r.l)}" data-id="${r.id}" data-k="l"`)}></label></div>
+    <label>Por onde este cômodo chega ao quadro?<select data-id="${r.id}" data-k="via" data-rr><option value="">Caminho próprio, direto ao quadro</option>${S.rooms.slice(0,i).map(o=>`<option value="${o.id}" ${o.id===r.via?'selected':''}>Junto com o caminho de ${esc(o.nome)}</option>`).join('')}</select></label>
+    <div class="f">${r.via?dst(r,'dd','Distância do quadro até onde os caminhos se separam (m)')+dst(r,'dr','Distância de onde se separam até este cômodo (m)'):dst(r,'dq','Distância do quadro até este cômodo (m)')}</div>
+    <p class="note">${r.via?'O trecho do quadro até onde os caminhos se separam é o mesmo do outro cômodo e é contado uma vez só.':'Pode ser uma medida aproximada. Se não souber, escolha uma faixa: ela fica marcada como estimativa.'}</p>
+    <div class="row">${rmb('rm',r.id)}</div></details>`).join(''):'<div class="empty">Nenhum cômodo ainda. Toque em um deles acima.</div>');
+  if(S.step===2)return `<h2>Pontos de cada cômodo</h2>`+(S.rooms.length?S.rooms.map(r=>`<details class="card" open><summary data-nm="${r.id}">${esc(r.nome)}</summary>
+    <div class="f"><label>Distância padrão entre pontos (m)<span data-est="${r.id}dpad">${r.dpadE?' (padrão)':''}</span><input ${num(`value="${esc(r.dpad)}" data-id="${r.id}" data-k="dpad"`)}></label></div>
+    <h3>Tomadas e USB (pontos de parede)</h3>
+    ${r.pontos.map((p,i)=>pontoHtml(r,p,i)).join('')||'<p class="note">Nenhum ponto de parede ainda.</p>'}
+    <div class="row"><button class="chip" data-act="addp" data-id="${r.id}">Adicionar ponto de parede</button></div>
+    <h3>Pontos de luz</h3>${r.luzAuto?'<p class="note">Quantidade sugerida pelo tamanho do cômodo. Você pode adicionar ou remover.</p>':''}
+    ${r.luzes.map((z,i)=>luzHtml(r,z,i)).join('')}
+    <div class="row"><button class="chip" data-act="addl" data-id="${r.id}">Adicionar ponto de luz</button></div>
+    <h3>Comandos da iluminação</h3>
+    ${r.comandos.map((c,i)=>cmdHtml(r,c,i)).join('')||'<p class="note">Cada ponto de luz precisa de um comando (interruptor).</p>'}
+    <div class="row"><button class="chip" data-act="addc" data-id="${r.id}">Adicionar comando</button></div>
+    <h3>Caixas de passagem</h3>
+    ${r.caixas.map((x,i)=>cxHtml(r,x,i)).join('')||'<p class="note">Sem caixa de passagem neste cômodo.</p>'}
+    <div class="row"><button class="chip" data-act="addx" data-id="${r.id}">Adicionar caixa de passagem</button></div>
+    <p class="note">A altura define a descida de cada ponto. A distância em branco usa o padrão do cômodo. Cada ponto de parede e cada ponto de luz leva uma caixa própria, embutida ou sobreposta. Em caixa 4x4, a placa também é 4x4.</p>
+    <details class="tec"><summary>Mais detalhes técnicos (opcional)</summary><div class="f"><label>Tipo de instalação<select data-id="${r.id}" data-k="inst">${opt(r.inst,INS)}</select></label>${fld(r,'pe','Pé-direito (m)')}</div>
+    <label>Observações<textarea rows="2" data-id="${r.id}" data-k="obs">${esc(r.obs)}</textarea></label></details></details>`).join(''):'<div class="empty">Volte e cadastre os cômodos.</div>');
+  if(S.step===3)return `<h2>Equipamentos de uso específico</h2><p class="note">Cada equipamento tem circuito próprio, que vai direto ao quadro de disjuntores e segue pelo eletroduto do cômodo. Pule esta etapa se não houver.</p>
+   <div class="row"><button class="chip" data-act="addq">Adicionar equipamento</button></div>`+
+   (S.equips.length?S.equips.map(q=>`<div class="box"><div class="f">
+    <label>Tipo<select data-eq="${q.id}" data-k="tipo">${opt(q.tipo,EQT)}</select></label>
+    <label>Cômodo<select data-eq="${q.id}" data-k="room"><option value="">Selecione</option>${S.rooms.map(r=>`<option value="${r.id}" ${r.id===q.room?'selected':''}>${esc(r.nome)}</option>`).join('')}</select></label>
+    ${fld(q,'pot','Potência (W), da etiqueta','number','min="0" max="99999" step="any"',`data-eq="${q.id}" data-k="pot"`)}
+    <label>Tensão<select data-eq="${q.id}" data-k="tens">${opt(q.tens,['127 V','220 V'])}</select></label>
+    ${fld(q,'dint','Da entrada do cômodo até o equipamento (m)','number','min="0" max="999" step="any"',`data-eq="${q.id}" data-k="dint"`)}
+    ${fld(q,'dist','Distância do equipamento até o quadro (m)','number','min="0" max="999" step="any"',`data-eq="${q.id}" data-k="dist"`)}
+    ${q.tipo==='Ar-condicionado'?`<label>Onde chega a alimentação<select data-eq="${q.id}" data-k="alim">${opt(q.alim,['Unidade externa','Unidade interna'])}</select></label>`:''}</div>
+    <p class="note" data-sug="${q.id}">${eqSug(q)}</p>
+    <p class="note" data-lig="${q.id}">${ligacao(q)}</p>
+    <div class="row">${rmb('rmq',q.id)}</div></div>`).join(''):'<div class="empty">Nenhum equipamento adicionado.</div>');
+  return `<div class="g3"><section><h2>Prévia gratuita</h2><div class="box"><div class="wrap"><table><tr><th>Cômodo</th><th>Caminho</th><th>Quadro até o cômodo (m)</th><th>Pontos</th><th>Caixas</th><th>Entre pontos (m)</th></tr>${S.rooms.map(r=>`<tr><td>${esc(r.nome)}</td><td>${r.via?'Junto com '+esc((room(r.via)||{}).nome):'Próprio'}</td><td>${routeLen(r)}</td><td>${nTom(r)} tomadas, ${nInt(r)} interruptores, ${nUsb(r)} USB, ${r.luzes.length} luzes</td><td>${nCx(r)}</td><td>${entre(r)}</td></tr>`).join('')||'<tr><td colspan="6">Sem cômodos</td></tr>'}</table></div>
+   ${S.equips.length?`<p class="note">Equipamentos: ${S.equips.map(q=>`${esc(q.tipo||'Equipamento')} (${esc((room(q.room)||{}).nome||'sem cômodo')}): ${eqDist(q)} m até o quadro`).join('; ')}.</p>`:''}<p class="note">Percurso quadro até cômodos, sem repetir trecho comum: <strong>${trunk()} m</strong>. São as distâncias informadas, somadas. Eletroduto, cabos, caixas e placas são calculados no PDF.</p></div></section>
+   <aside class="box"><h3>Resumo</h3>${live()}<div class="row"><button class="pri" data-act="pdf">Solicitar PDF completo</button></div></aside></div>`;
+}
+function viewCad(){
+  const t=AUTH.tab;
+  const tabs=t==='new'?'':`<div class="chips" role="group" aria-label="Acesso à conta">${[['in','Entrar'],['up','Criar conta'],['rec','Esqueci minha senha']].map(([k,n])=>`<button class="chip" data-act="tab" data-t="${k}" aria-pressed="${t===k}">${n}</button>`).join('')}</div>`;
+  const em=`<label>E-mail<input id="ae" data-au="email" type="email" maxlength="120" autocomplete="email" value="${esc(AUTH.email)}"></label>`;
+  let tit='',f='',ba='',bl='',nt='';
+  if(t==='in'){tit='Entre na sua conta';f=`<div class="f">${em}<label>Senha<input id="ap" type="password" autocomplete="current-password"></label></div>`;ba='login';bl='Entrar e continuar'}
+  else if(t==='up'){tit='Crie sua conta para continuar';
+    f=`<div class="f"><label>Nome completo<input id="an" data-au="nome" maxlength="100" autocomplete="name" value="${esc(AUTH.nome)}"></label>${em}<label>WhatsApp (opcional)<input id="aw" data-au="whats" type="tel" maxlength="20" autocomplete="tel" value="${esc(AUTH.whats)}"></label><label>Senha (mínimo 8 caracteres)<input id="ap" type="password" autocomplete="new-password"></label></div>
+    <label class="ck"><input type="checkbox" id="aa"> Li e aceito os termos de uso e a política de privacidade</label>`;
+    ba='signup';bl='Criar conta e continuar';
+    nt='<p class="note">Vamos enviar um e-mail para confirmar sua conta. Para você não perder o orçamento enquanto confirma, ele fica guardado neste navegador por até 24 horas (sem a senha) e depois é apagado.</p>'}
+  else if(t==='rec'){tit='Esqueci minha senha';f=`<p class="note">Informe o e-mail da conta. Enviaremos um link para criar uma nova senha.</p><div class="f">${em}</div>`;ba='recover';bl='Enviar link'}
+  else{tit='Crie uma nova senha';f=`<div class="f"><label>Nova senha (mínimo 8 caracteres)<input id="an1" type="password" autocomplete="new-password"></label><label>Repita a nova senha<input id="an2" type="password" autocomplete="new-password"></label></div>`;ba='newpw';bl='Salvar nova senha'}
+  if(!sb)nt+='<p class="err" role="alert">Login indisponível: falta colocar a URL e a chave anon do Supabase no arquivo.</p>';
+  return `<div class="box" data-auth><h2>${tit}</h2>${tabs}${f}${nt}
+  ${(t==='in'||t==='up')&&pend().length?'<p class="note">Há pendências no orçamento. O PDF vai indicá-las.</p>':''}
+  ${AUTH.msg?`<p class="ok" role="status">${esc(AUTH.msg)}</p>`:''}
+  ${AUTH.err?`<p class="err" role="alert">${esc(AUTH.err)}</p>`:''}
+  <div class="row"><button class="sec" data-act="bk">Voltar ao orçamento</button><button class="pri" data-act="${ba}" data-main>${bl}</button></div></div>`}
+function viewPix(){return `<div class="box"><h2>Pagamento do PDF</h2><p>Pedido <strong>${esc(S.order.id)}</strong>, status: <strong>${S.order.status}</strong></p><p class="note">Conta: ${esc(S.user.nome)} (${esc(S.user.email)})</p>
+  <div class="f"><div class="qr">QR Code criado pelo servidor</div><div><label>Pix copia e cola<input readonly value="Gerado pelo servidor"></label><p class="note">Validade e valor vêm do servidor. O botão de pagar nunca marca o pedido como pago.</p></div></div>
+  <div class="row"><button class="sec" data-act="chk">Verificar pagamento</button><button class="pri" disabled>Baixar PDF</button><button class="sec" data-act="bk">Voltar ao orçamento</button></div></div>`}
+function render(){
+  let h='';
+  if(S.view==='cad')h=viewCad();else if(S.view==='pix')h=viewPix();
+  else h=`<ol class="steps">${STEPN.map((n,i)=>`<li ${i===S.step?'aria-current="step"':''} class="${i<S.step?'done':''}">${i+1}. ${n}</li>`).join('')}</ol>`+stepForm()+
+    (S.err?`<p class="err" role="alert">${esc(S.err)}</p>`:'')+
+    `<div class="row">${S.step>0?'<button class="sec" data-act="back">Voltar</button>':''}${S.step<LAST?'<button class="pri" data-act="next">Continuar</button>':''}</div>`;
+  $('#app').innerHTML=h;nav();persist();
+}
+function nav(){const n=$('#nav');if(!n)return;n.innerHTML=S.user?`<span class="note">${esc(S.user.nome||S.user.email)}</span><button class="sec" data-act="logout">Sair</button>`:(sb&&S.view!=='cad'?'<button class="sec" data-act="gocad">Entrar</button>':'')}
+function toast(t){const e=$('#toast');e.textContent=t;e.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>e.style.display='none',6000)}
+function validate(){
+  if(S.step===0&&!(S.imovel&&S.obra&&S.cobertura))return 'Escolha o tipo de imóvel, o tipo de obra e o teto.';
+  if(S.step===1){if(!S.rooms.length)return 'Adicione pelo menos um cômodo.';
+    if(S.rooms.some(r=>!r.nome.trim()||!(r.c>0&&r.l>0)))return 'Cada cômodo precisa de nome, comprimento e largura maiores que zero.';
+    if(S.rooms.some(r=>!routeOk(r)))return 'Informe a distância até o quadro de cada cômodo, ou escolha uma faixa.'}
+  if(S.step===2&&!S.rooms.some(r=>pts(r)>0))return 'Adicione pelo menos um ponto de parede ou de luz.';
+  return '';
+}
+const newOrder=()=>{if(!S.order)S.order={id:nid('p'),status:'aguardando_pagamento'}};
+const cp=o=>JSON.parse(JSON.stringify(o));
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-act]');if(!b)return;
+  const d=b.dataset,now=Date.now(),r=room(d.id),p=r&&r.pontos.find(x=>x.id===d.p),c=r&&r.comandos.find(x=>x.id===d.c);
+  if(['login','signup','recover','newpw','logout'].includes(d.act)){doAuth(d.act,b);return}
+  if(['add','addq','addp','addm','dupp','addl','addc','adds','addx'].includes(d.act)){if(now-lock<400)return;lock=now}
+  S.err='';
+  if(d.act==='next'){const m=validate();if(m)S.err=m;else S.step++}
+  else if(d.act==='back')S.step--;
+  else if(d.act==='add')addRoom(d.b);
+  else if(d.act==='addq')S.equips.push({id:nid('q'),tipo:'',room:'',pot:'',tens:'',dint:'',dist:'',alim:''});
+  else if(d.act==='addp'&&r)r.pontos.push(mkPonto());
+  else if(d.act==='addm'&&p)p.mods.push(mkMod('T10'));
+  else if(d.act==='dupp'&&p){const x=cp(p);x.id=nid('p');x.mods.forEach(m=>m.id=nid('m'));r.pontos.splice(r.pontos.indexOf(p)+1,0,x)}
+  else if(d.act==='rmm'&&p){if(p.mods.length>1)p.mods=p.mods.filter(m=>m.id!==d.m)}
+  else if(d.act==='addl'&&r){r.luzAuto=false;r.luzes.push(mkLuz())}
+  else if(d.act==='rml'&&r){r.luzAuto=false;r.luzes=r.luzes.filter(z=>z.id!==d.lz);r.comandos.forEach(k=>k.luzes=k.luzes.filter(i=>i!==d.lz))}
+  else if(d.act==='addc'&&r)r.comandos.push(mkCmd());
+  else if(d.act==='rmc'&&r)r.comandos=r.comandos.filter(k=>k.id!==d.c);
+  else if(d.act==='adds'&&c)c.sws.splice(c.sws.length-1,0,mkSw());
+  else if(d.act==='rms'&&c&&c.sws.length>3)c.sws=c.sws.filter(w=>w.id!==d.s);
+  else if(d.act==='addx'&&r)r.caixas.push({...mkCx(),s:false});
+  else if(d.act==='rmx'&&r)r.caixas=r.caixas.filter(x=>x.id!==d.bx);
+  else if(d.act==='rm'||d.act==='rmq'||d.act==='rmp'){
+    if(S.conf===d.key){
+      if(d.act==='rm'){S.rooms=S.rooms.filter(x=>x.id!==d.id);S.rooms.forEach(x=>{if(x.via===d.id){x.via='';x.dd=x.dr='';x.ddE=x.drE=false}});S.equips.forEach(q=>{if(q.room===d.id)q.room=''})}
+      else if(d.act==='rmq')S.equips=S.equips.filter(q=>q.id!==d.id);
+      else if(r)r.pontos=r.pontos.filter(x=>x.id!==d.key);
+      S.conf=null}
+    else S.conf=d.key;
+  }
+  else if(d.act==='pdf'){if(S.user){newOrder();S.view='pix'}else{saveTmp();NEXT=true;AUTH.tab='in';AUTH.err=AUTH.msg='';S.view='cad'}}
+  else if(d.act==='bk'){NEXT=false;clearTmp();S.view='form'}
+  else if(d.act==='chk'){toast('Sem servidor neste protótipo. O status só pode vir do backend: continua aguardando_pagamento.');return}
+  else if(d.act==='tab'){AUTH.tab=d.t;AUTH.err=AUTH.msg=''}
+  else if(d.act==='gocad'){NEXT=false;AUTH.tab='in';AUTH.err=AUTH.msg='';S.view='cad'}
+  render();
+});
+document.addEventListener('input',e=>{
+  const t=e.target,d=t.dataset;let v=t.value;
+  if(d.au){AUTH[d.au]=t.value;return}
+  if(t.type==='number'&&v!==''&&+v<0){v='0';t.value=v}
+  if(d.g)S[d.g]=v;
+  else if(d.eq){const q=S.equips.find(x=>x.id===d.eq);if(!q)return;q[d.k]=v;const a=document.querySelector(`[data-sug="${q.id}"]`),b=document.querySelector(`[data-lig="${q.id}"]`);if(a)a.textContent=eqSug(q);if(b)b.textContent=ligacao(q)}
+  else if(d.id){const r=room(d.id);if(!r||d.band||!d.k||d.cz!==undefined)return;
+    let o=r;
+    if(d.lz)o=r.luzes.find(x=>x.id===d.lz);
+    else if(d.bx){o=r.caixas.find(x=>x.id===d.bx);if(o)o.s=false}
+    else if(d.c){const c=r.comandos.find(x=>x.id===d.c);o=d.s?c&&c.sws.find(w=>w.id===d.s):c}
+    else if(d.p){const p=r.pontos.find(x=>x.id===d.p);o=d.m?p&&p.mods.find(x=>x.id===d.m):p}
+    if(!o)return;
+    o[d.k]=v;
+    if(d.d!==undefined){r[d.k+'E']=false;document.querySelectorAll(`[data-est="${r.id}${d.k}"]`).forEach(x=>x.textContent='')}
+    if(o===r&&d.k==='dpad'){r.dpadE=false;document.querySelectorAll(`[data-est="${r.id}dpad"]`).forEach(x=>x.textContent='')}
+    if(o===r&&(d.k==='c'||d.k==='l')){r.medE=false;document.querySelectorAll(`[data-est="${r.id}med"]`).forEach(x=>x.textContent='')}
+    if(o===r&&d.k==='nome')document.querySelectorAll(`[data-nm="${r.id}"]`).forEach(x=>x.textContent=v||'Sem nome')}
+  else return;
+  document.querySelectorAll('.live').forEach(x=>x.innerHTML=summary());persist();
+});
+document.addEventListener('change',e=>{
+  const t=e.target,d=t.dataset;
+  if(d.band){const r=room(d.id);if(!r||t.value==='')return;r[d.band]=t.value;r[d.band+'E']=true;render()}
+  else if(d.sv!==undefined){S.save=t.checked;if(!S.save)try{localStorage.removeItem(KEY)}catch(x){}persist()}
+  else if(d.cz!==undefined){const r=room(d.id),c=r&&r.comandos.find(x=>x.id===d.cz);if(!c)return;c.luzes=c.luzes.filter(i=>i!==d.lz);if(t.checked)c.luzes.push(d.lz);document.querySelectorAll('.live').forEach(x=>x.innerHTML=summary());persist()}
+  else if(d.id&&d.k==='via'){const r=room(d.id);if(!r)return;r.via=t.value;r.dq=r.dd=r.dr='';r.dqE=r.ddE=r.drE=false;render()}
+  else if(d.id&&d.c&&d.k==='t'){const r=room(d.id),c=r&&r.comandos.find(x=>x.id===d.c);if(c)fixSw(c);render()}
+  else if(d.id&&(d.k==='c'||d.k==='l')){const r=room(d.id);if(r&&suggestLuz(r))render()}
+  else if(d.id&&(d.k==='dpad'||d.bx))render();
+  else if(d.eq&&(d.k==='room'||d.k==='tipo'))render();
+});
+const userFrom=u=>{const m=u.user_metadata||{};return{id:u.id,nome:m.nome||'',email:u.email||'',whats:m.whats||''}};
+const okMail=m=>/^\S+@\S+\.\S+$/.test(m);
+function msgErr(er){const m=String(er&&er.message||'');
+  if(/invalid login/i.test(m))return 'E-mail ou senha incorretos.';
+  if(/not confirmed/i.test(m))return 'Confirme seu e-mail pelo link que enviamos antes de entrar.';
+  if(/rate limit|too many|security purposes/i.test(m)||(er&&er.status===429))return 'Muitas tentativas. Espere alguns minutos e tente de novo.';
+  if(/same password|different from the old/i.test(m))return 'A nova senha precisa ser diferente da anterior.';
+  if(/password/i.test(m))return 'Senha muito fraca ou curta. Use pelo menos 8 caracteres.';
+  return 'Não foi possível concluir agora. Tente de novo.'}
+function afterLogin(){if(NEXT){NEXT=false;clearTmp();S.step=LAST;newOrder();S.view='pix'}else if(S.view==='cad')S.view='form';render()}
+async function doAuth(act,btn){
+  if(AUTH.busy)return;
+  AUTH.err=AUTH.msg='';
+  if(!sb){AUTH.err='Login indisponível: falta colocar a URL e a chave anon do Supabase no arquivo.';render();return}
+  const g=id=>{const e=document.getElementById(id);return e?e.value:''};
+  AUTH.busy=true;if(btn)btn.disabled=true;
+  try{
+    if(act==='logout'){
+      await sb.auth.signOut();clearTmp();NEXT=false;S.user=null;S.order=null;S.view='form';AUTH.email=AUTH.nome=AUTH.whats='';AUTH.tab='in'
+    }else if(act==='login'){
+      const m=g('ae').trim(),pw=g('ap');
+      if(!okMail(m))AUTH.err='Informe um e-mail válido.';
+      else if(!pw)AUTH.err='Informe sua senha.';
+      else{const {error}=await sb.auth.signInWithPassword({email:m,password:pw});if(error)AUTH.err=msgErr(error)}
+    }else if(act==='signup'){
+      const n=g('an').trim(),m=g('ae').trim(),w=g('aw').trim(),pw=g('ap'),ac=document.getElementById('aa');
+      if(!n)AUTH.err='Informe seu nome.';
+      else if(!okMail(m))AUTH.err='Informe um e-mail válido.';
+      else if(pw.length<8)AUTH.err='A senha precisa ter pelo menos 8 caracteres.';
+      else if(!(ac&&ac.checked))AUTH.err='Aceite os termos e a política de privacidade para continuar.';
+      else{
+        const {data,error}=await sb.auth.signUp({email:m,password:pw,options:{data:{nome:n,whats:w,aceite_em:new Date().toISOString()},emailRedirectTo:location.origin+location.pathname}});
+        if(error)AUTH.err=msgErr(error);
+        else if(!(data&&data.session)){AUTH.tab='in';AUTH.msg='Enviamos um e-mail de confirmação para '+m+'. Abra o e-mail e clique no link: você volta aqui com o orçamento pronto. Se este e-mail já tiver conta, use “Entrar” ou “Esqueci minha senha”.'}
+      }
+    }else if(act==='recover'){
+      const m=g('ae').trim();
+      if(!okMail(m))AUTH.err='Informe um e-mail válido.';
+      else{const {error}=await sb.auth.resetPasswordForEmail(m,{redirectTo:location.origin+location.pathname});
+        if(error&&(/rate|many|security/i.test(error.message||'')||error.status===429))AUTH.err=msgErr(error);
+        else AUTH.msg='Se este e-mail tiver conta, enviamos um link para criar uma nova senha. Confira também a caixa de spam.'}
+    }else if(act==='newpw'){
+      const p1=g('an1'),p2=g('an2');
+      if(p1.length<8)AUTH.err='A senha precisa ter pelo menos 8 caracteres.';
+      else if(p1!==p2)AUTH.err='As duas senhas não são iguais.';
+      else{const {error}=await sb.auth.updateUser({password:p1});
+        if(error)AUTH.err=msgErr(error);
+        else{AUTH.rec=false;AUTH.busy=false;try{history.replaceState(null,'',location.pathname+location.search)}catch(x){}toast('Senha alterada com sucesso.');afterLogin();return}}
+    }
+  }catch(e){AUTH.err='Sem conexão com o servidor. Tente de novo.'}
+  AUTH.busy=false;render();
+}
+if(sb)sb.auth.onAuthStateChange((ev,ses)=>{
+  const prev=S.user?S.user.id:null,nu=ses&&ses.user?userFrom(ses.user):null;
+  S.user=nu;
+  if(!AUTH.rec&&ev!=='PASSWORD_RECOVERY'&&ev!=='INITIAL_SESSION'&&(nu?nu.id:null)===prev)return;
+  if(nu&&(AUTH.rec||ev==='PASSWORD_RECOVERY')){AUTH.rec=true;AUTH.tab='new';S.view='cad';render();return}
+  if(nu&&(ev==='SIGNED_IN'||ev==='INITIAL_SESSION')&&(NEXT||S.view==='cad')){
+    if(/access_token/.test(location.hash)){try{history.replaceState(null,'',location.pathname+location.search)}catch(x){}}
+    afterLogin();return}
+  if(!nu&&S.view==='pix'){S.view='cad';S.order=null;AUTH.tab='in'}
+  render();
+});
+document.addEventListener('keydown',e=>{const t=e.target;if(e.key==='Enter'&&t.tagName==='INPUT'&&t.type!=='checkbox'&&t.closest('[data-auth]')){e.preventDefault();const b=document.querySelector('[data-auth] [data-main]');if(b)b.click()}});
+render();
+</script>
+</body>
+</html>
